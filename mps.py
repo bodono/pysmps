@@ -10,9 +10,6 @@ if len(data["rhs_names"]) > 1:
 if len(data["bnd_names"]) > 1:
   raise ValueError("more than one bnd")
 
-print(data)
-print(data["A"].todense())
-
 A_mps = data["A"]
 c = data["c"]
 b_mps = data["rhs"][data["rhs_names"][0]]
