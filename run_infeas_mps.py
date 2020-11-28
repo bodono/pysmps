@@ -137,9 +137,9 @@ for lp in infeasible_lps:
   print(f'OSQP status {osqp_results.info.status}')
   print(f'OSQP iters {osqp_results.info.iter}')
 
-  results_dict[lp] = {'scs_iters' = scs_results["info"]["iter"],
-                      'scs_status' = scs_results["info"]["status"],
-                      'osqp_iters' = osqp_results.info.iter,
-                      'osqp_status' = osqp_results.info.status}
+  results_dict[lp] = {'scs_iters': scs_results["info"]["iter"],
+                      'scs_status': scs_results["info"]["status"],
+                      'osqp_iters': osqp_results.info.iter,
+                      'osqp_status': osqp_results.info.status}
 
 print(results_dict)
