@@ -148,11 +148,6 @@ for lp in infeasible_lps:
             #verbose=verbose, rho=SCALE)
   osqp_results = oss.solve()
 
-  x_cert = osqp_results.dual_inf_cert
-  y_cert = osqp_results.prim_inf_cert
-
-  import pdb; pdb.set_trace()
-
   print(f'OSQP status {osqp_results.info.status}')
   print(f'OSQP iters {osqp_results.info.iter}')
 
