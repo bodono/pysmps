@@ -3,6 +3,7 @@ import numpy as np
 import scs
 import scipy.sparse
 import osqp
+import time
 
 infeasible_lps = sorted([
  "afiro", # not actually infeasible
@@ -36,6 +37,13 @@ infeasible_lps = sorted([
  "pang",
  "pilot4i",
 ])
+
+infeasible_lps = [
+ "d6cube",
+ "bgdbg1",
+ "galenet",
+]
+
 
 VERBOSE=True
 results_dict = {}
@@ -129,14 +137,19 @@ for lp in infeasible_lps:
 
   probdata = dict(A=A_scs.tocsc(), b=b_scs, c=c)
   cone = dict(f=int(sum(types=='E')), bu=u.tolist(), bl=l.tolist())
+
+  start = time.time()
   scs_results = scs.solve(probdata, cone,
                           adaptive_scaling=True, eps_infeas=1e-6,
-                          verbose=VERBOSE,
+                          verbose=VERBOSE, normalize=True,
                           scale=0.1, max_iters=int(1e5),eps_rel=1e-6, eps_abs=1e-6,
                           acceleration_lookback=0)
+  end = time.time()
+  print('time:', end - start)
   print(f'SCS status {scs_results["info"]["status"]}')
   print(f'SCS iters {scs_results["info"]["iter"]}')
 
+  start = time.time()
   oss = osqp.OSQP()
   oss.setup(q=c, A=A_osqp.tocsc(), l=l_osqp, u=u_osqp, eps_rel=1e-6, eps_abs=1e-6,
             eps_prim_inf = 1e-6, eps_dual_inf = 1e-6, verbose=VERBOSE,
@@ -147,6 +160,8 @@ for lp in infeasible_lps:
             #eps_dual_inf=EPS, eps_abs=EPS, eps_rel=EPS, alpha=ALPHA,
             #verbose=verbose, rho=SCALE)
   osqp_results = oss.solve()
+  end = time.time()
+  print('time:', end - start)
 
   print(f'OSQP status {osqp_results.info.status}')
   print(f'OSQP iters {osqp_results.info.iter}')
