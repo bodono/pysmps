@@ -114,9 +114,9 @@ def load_mps(path):
                           line[idx+1])] = float(line[idx+2])
                     except Exception as e:
                       if objective_name == line[idx+1]:
-                        print("MPS read warning: objective appearing in RHS, ignoring") 
+                        print("MPS read warning: objective appearing in RHS, ignoring")
                       else:
-                        raise e 
+                        raise e
             elif mode == CORE_FILE_RHS_MODE_NO_NAME:
                 if len(line) % 2 == 1: # odd: RHS named
                   try:
@@ -132,9 +132,9 @@ def load_mps(path):
                             line[idx+1])] = float(line[idx+2])
                       except Exception as e:
                         if objective_name == line[idx+1]:
-                          print("MPS read warning: objective appearing in RHS, ignoring") 
+                          print("MPS read warning: objective appearing in RHS, ignoring")
                         else:
-                          raise e 
+                          raise e
                 else: # even, no RHS name
                   try:
                       i = rhs_names.index("TEMP")
@@ -149,9 +149,9 @@ def load_mps(path):
                         line[idx])] = float(line[idx+1])
                     except Exception as e:
                       if objective_name == line[idx]:
-                        print("MPS read warning: objective appearing in RHS, ignoring") 
+                        print("MPS read warning: objective appearing in RHS, ignoring")
                       else:
-                        raise e 
+                        raise e
 
             elif mode == CORE_FILE_BOUNDS_MODE_NAME_GIVEN:
                 if line[1] != bnd_names[-1]:
@@ -165,10 +165,18 @@ def load_mps(path):
                         line[2])] = float(line[3])
                     bnd[line[1]]['UP'][col_names.index(
                         line[2])] = float(line[3])
-                elif line[0] == 'FR':
+                elif line[0] == 'PL': # free positive (aka default)
+                    bnd[line[1]]['LO'][col_names.index(line[2])] = 0
+                elif line[0] == 'FR': # free
                     bnd[line[1]]['LO'][col_names.index(line[2])] = -np.inf
+                elif line[0] == 'BV': # binary value
+                    bnd[line[1]]['LO'][col_names.index(
+                        line[2])] = 0.
+                    bnd[line[1]]['UP'][col_names.index(
+                        line[2])] = 1.
+
             elif mode == CORE_FILE_BOUNDS_MODE_NO_NAME:
-              _bnds = ['FR', 'BV']
+              _bnds = ['FR', 'BV', 'PL']
               if (len(line) % 2 == 0 and line[0] not in _bnds) or (len(line) % 2 == 1 and line[0] in _bnds): # even, bound has name
                   try:
                       i = bnd_names.index(line[1])
@@ -185,6 +193,8 @@ def load_mps(path):
                           line[2])] = float(line[3])
                       bnd[line[1]]['UP'][col_names.index(
                           line[2])] = float(line[3])
+                  elif line[0] == 'PL': # free positive (aka default)
+                      bnd[line[1]]['LO'][col_names.index(line[2])] = 0
                   elif line[0] == 'FR': # free
                       bnd[line[1]]['LO'][col_names.index(line[2])] = -np.inf
                   elif line[0] == 'BV': # binary value
