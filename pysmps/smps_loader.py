@@ -168,7 +168,8 @@ def load_mps(path):
                 elif line[0] == 'FR':
                     bnd[line[1]]['LO'][col_names.index(line[2])] = -np.inf
             elif mode == CORE_FILE_BOUNDS_MODE_NO_NAME:
-              if (len(line) % 2 == 0 and line[0] != 'FR') or (len(line) % 2 == 1 and line[0] == 'FR'): # even, bound has name
+              _bnds = ['FR', 'BV']
+              if (len(line) % 2 == 0 and line[0] not in _bnds) or (len(line) % 2 == 1 and line[0] in _bnds): # even, bound has name
                   try:
                       i = bnd_names.index(line[1])
                   except:
@@ -179,13 +180,18 @@ def load_mps(path):
                   if line[0] in ['LO', 'UP']:
                       bnd[line[1]][line[0]][col_names.index(
                           line[2])] = float(line[3])
-                  elif line[0] == 'FX':
+                  elif line[0] == 'FX': # fixed
                       bnd[line[1]]['LO'][col_names.index(
                           line[2])] = float(line[3])
                       bnd[line[1]]['UP'][col_names.index(
                           line[2])] = float(line[3])
-                  elif line[0] == 'FR':
+                  elif line[0] == 'FR': # free
                       bnd[line[1]]['LO'][col_names.index(line[2])] = -np.inf
+                  elif line[0] == 'BV': # binary value
+                      bnd[line[1]]['LO'][col_names.index(
+                          line[2])] = 0.
+                      bnd[line[1]]['UP'][col_names.index(
+                          line[2])] = 1.
               else: # odd, bound has no name
                   try:
                       i = bnd_names.index("TEMP_BOUND")
